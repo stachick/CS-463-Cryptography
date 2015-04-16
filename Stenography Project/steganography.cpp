@@ -1,7 +1,7 @@
 //stenography.cpp
 //Shane Tachick
 //February 23, 2015
-//Program that will hopefully hide data instide of a PPM image file
+//Program that will hopefully hide data inside of a PPM image file
 
 #include <iostream>
 using std::endl;
