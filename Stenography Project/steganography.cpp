@@ -44,7 +44,7 @@ int convertToInt(char M)
 void loadVector(vector<redGreenBlue> &wordlist, string filename, string &header, int &x, int &y, int &colors)
 {
 	wordlist.clear();
-	
+
 	redGreenBlue temp;
 	int tempRed;
 	int tempGreen;
@@ -54,13 +54,13 @@ void loadVector(vector<redGreenBlue> &wordlist, string filename, string &header,
 	file >> x;
 	file >> y;
 	file >> colors;
-		while (file >> tempRed >> tempGreen >> tempBlue)
-		{
-			temp.red = tempRed;
-			temp.green = tempGreen;
-			temp.blue = tempBlue;
-			wordlist.push_back(temp);
-		}
+	while (file >> tempRed >> tempGreen >> tempBlue)
+	{
+		temp.red = tempRed;
+		temp.green = tempGreen;
+		temp.blue = tempBlue;
+		wordlist.push_back(temp);
+	}
 }
 
 //takes a .txt file (hopefully) and uses it to make a vector of ints that correspond to the message
@@ -80,7 +80,7 @@ void messageToVector(string filename, vector <redGreenBlue> &charMap)
 	// uncomment this to test what the message is
 	//cout << message << endl;
 
-	for (size_t i = 0; i < message.size(); i +=3)
+	for (size_t i = 0; i < message.size(); i += 3)
 	{
 		temp.red = (int)message[i];
 		if (message.size() > i + 1)
@@ -171,7 +171,7 @@ void generateCode(vector <redGreenBlue> incomingPPM, vector <redGreenBlue> incom
 	PPMindex %= incomingPPM.size();
 	int startPos = PPMindex;
 	int offset = 0;
-	
+
 	cleanerVector(incomingTXT, cleanerInput);
 
 	//takes 'characters' from cleanerInput and searches incomingPPM for a match, then outputs the index
@@ -215,7 +215,7 @@ void generateCode(vector <redGreenBlue> incomingPPM, vector <redGreenBlue> incom
 	/*
 	for (int i = 0; i < cleanerInput.size(); i++)
 	{
-		cout << (char)cleanerInput[i];
+	cout << (char)cleanerInput[i];
 	}
 	*/
 }
@@ -263,19 +263,19 @@ void decodeCode(string inputTXT, vector <redGreenBlue> basePPM)
 bitset<8> toBinary(int number)
 {
 	bitset<8> temp;
-	int index = 7;
+	int index = 0;
 	while (number >= 1)
 	{
 		temp[index] = number % 2;
-		number /=2;
-		index--;
+		number /= 2;
+		index++;
 	}
 
 
 	/* Uncomment for sanity checking
 	for (size_t i = 0; i < temp.size(); i++)
 	{
-		cout << temp[i];
+	cout << temp[i];
 	}
 	*/
 	return temp;
@@ -285,6 +285,8 @@ bitset<8> toBinary(int number)
 //uncomment the print statements for sanity checking
 void convertMSGtoBinary(vector<redGreenBlue> &incomingTXT, vector <bitset<8>> &messageInBinary)
 {
+	messageInBinary.clear();
+
 	for (size_t i = 0; i < incomingTXT.size(); i++)
 	{
 		//cout << incomingTXT[i].red << endl;
@@ -299,8 +301,41 @@ void convertMSGtoBinary(vector<redGreenBlue> &incomingTXT, vector <bitset<8>> &m
 	}
 }
 
+void convertPasswordToBinary(string password, vector <bitset<8>> &binaryPassword)
+{
+	binaryPassword.clear();
 
-void createBinaryCodedPPM(vector <bitset<8>> & messageInBinary, vector <redGreenBlue> &incomingPPM, string newImage,  string header, int x, int y, int colors)
+	for (size_t i = 0; i < password.size(); i++)
+	{
+		binaryPassword.push_back(password[i]);
+	}
+
+	//uncomment to sanity check your password
+	/*
+	for (size_t i = 0; i < binaryPassword.size(); i++)
+	{
+		cout << binaryPassword[i] << endl;
+	}
+	*/
+}
+
+void xorMessageAndPassword(vector <bitset<8>> &messageInBinary, vector <bitset<8>> binaryPassword)
+{
+	for (size_t i = 0; i < messageInBinary.size(); i++)
+	{
+		//uncomment to sanity check the logic
+		/*
+		cout << "mes: " << messageInBinary[i] << endl;
+		cout << "Pas: " << binaryPassword[i % binaryPassword.size()] << endl;
+		cout << "Xor: " << (messageInBinary[i] ^ binaryPassword[i % binaryPassword.size()]) << endl;
+		cout << endl;
+		*/
+
+		messageInBinary[i] = messageInBinary[i] ^ binaryPassword[i % binaryPassword.size()];
+	}
+}
+
+void createBinaryCodedPPM(vector <bitset<8>> & messageInBinary, vector <redGreenBlue> &incomingPPM, string newImage, string header, int x, int y, int colors)
 {
 	vector <int> cleanerPPM;
 
@@ -311,6 +346,15 @@ void createBinaryCodedPPM(vector <bitset<8>> & messageInBinary, vector <redGreen
 		cout << "This picture is too small to encode this message" << endl;
 		return;
 	}
+
+	//sanity checking on binary message
+	/*
+	cout << "Message going into the file" << endl;
+	for (size_t i = 0; i < messageInBinary.size(); i++)
+	{
+		cout << messageInBinary[i] << endl;
+	}
+	*/
 
 	ofstream out(newImage);
 	int binCounter = 0;
@@ -354,13 +398,13 @@ void createBinaryCodedPPM(vector <bitset<8>> & messageInBinary, vector <redGreen
 			out << cleanerPPM[counter] << " ";
 			out << cleanerPPM[counter + 1] << " ";
 			out << cleanerPPM[counter + 2] << "    ";
-			counter+=3;
+			counter += 3;
 		}
 		out << "\n";
 	}
 }
 
-void decodeBinary(string codedPPM)
+void decodeBinary(string codedPPM, vector <bitset<8>> binaryPassword)
 {
 	string stringDontCareHeader;
 	int X;
@@ -370,7 +414,7 @@ void decodeBinary(string codedPPM)
 	vector <int> workingVector;
 	vector <bitset<8>> binMSG;
 	int charCounter = 0;
-	int binCounter = 7;
+	int binCounter = 0;
 	bitset<8> tempBitset;
 
 	loadVector(temp, codedPPM, stringDontCareHeader, X, Y, intDontCareColors);
@@ -383,23 +427,27 @@ void decodeBinary(string codedPPM)
 		else
 			tempBitset[binCounter] = 0;
 
-		binCounter--;
+		binCounter++;
 
-		if (binCounter < 0)
+		if (binCounter > 7)
 		{
-			binCounter = 7;
+			binCounter = 0;
 			charCounter++;
 			binMSG.push_back(tempBitset);
 		}
 	}
 
+	//sanity checking for the binary message coming out of the file
 	/*
+	cout << "Binary coming from the coded image" << endl;
 	for (size_t i = 0; i < binMSG.size(); i++)
 	{
-		cout << binMSG[i] << endl;
+	cout << binMSG[i] << endl;
 	}
 	*/
-	
+
+	xorMessageAndPassword(binMSG, binaryPassword);
+
 	ofstream out("binaryMessage.txt");
 	for (size_t i = 0; i < binMSG.size(); i++)
 	{
@@ -430,6 +478,7 @@ int main()
 	string newImage;
 	string header;
 	string codedPPM;
+	string password;
 	int menuOption = -1;
 	int x;
 	int y;
@@ -437,6 +486,7 @@ int main()
 	srand(time(0));
 
 	vector <bitset<8>> messageInBinary;
+	vector <bitset<8>> binaryPassword;
 	vector <redGreenBlue> incomingPPM;
 	vector <redGreenBlue> incomingTXT;
 
@@ -448,7 +498,9 @@ int main()
 			"1. Load a PPM image and print it to the console.\n" <<
 			"2. Generate a random image using your message as the Red, Green, and Blue values for each pixel.\n" <<
 			"3. Generate a coded message from a PPM image that can be decoded using the same image.\n" <<
-			"4. Alter a PPM image to hide your message by manipulating the least significant bits of the RGB values for each pixel.\n" << endl;
+			"4. Decodes a message that was encoded using option 4.\n" <<
+			"5. Alter a PPM image to hide your message by manipulating the least significant bits of the RGB values for each pixel.\n"
+			"6. Decodes a message that was encoded using option 5.\n" << endl;
 
 		cout << endl << "Enter your choice." << endl;
 		cin >> menuOption;
@@ -464,7 +516,7 @@ int main()
 
 			waitOnUser();
 			break;
-			
+
 		case 2:
 			//takes a TXT file and generates a garbage PPM image from it
 			cout << "What is the name of the TXT file you want to disguise?" << endl;
@@ -509,15 +561,27 @@ int main()
 			cin >> inputPPM;
 			cout << "What is the message you want disguised?" << endl;
 			cin >> inputTXT;
+			cout << "What is your password?" << endl;
+			cin >> password;
 			cout << "What do you want the duplicate image named?" << endl;
 			cin >> newImage;
-			cout << "What is the name of the binary coded PPM image?" << endl;
-			cin >> codedPPM;
 			loadVector(incomingPPM, inputPPM, header, x, y, colors);
 			messageToVector(inputTXT, incomingTXT);
 			convertMSGtoBinary(incomingTXT, messageInBinary);
+			convertPasswordToBinary(password, binaryPassword);
+			xorMessageAndPassword(messageInBinary, binaryPassword);
 			createBinaryCodedPPM(messageInBinary, incomingPPM, newImage, header, x, y, colors);
-			decodeBinary(codedPPM);
+
+			waitOnUser();
+			break;
+
+		case 6:
+			cout << "What is the name of the binary coded PPM image?" << endl;
+			cin >> codedPPM;
+			cout << "What is your password?" << endl;
+			cin >> password;
+			convertPasswordToBinary(password, binaryPassword);
+			decodeBinary(codedPPM, binaryPassword);
 
 			waitOnUser();
 			break;
