@@ -167,9 +167,8 @@ void generateCode(vector <redGreenBlue> incomingPPM, vector <redGreenBlue> incom
 	vector <string> temp;
 	vector <int> cleanerInput;
 	ofstream out("codedmessage.txt");
-	int PPMindex = rand();
-	PPMindex %= incomingPPM.size();
-	int startPos = PPMindex;
+	int PPMindex = 0;
+	int startPos = 0;
 	int offset = 0;
 
 	cleanerVector(incomingTXT, cleanerInput);
@@ -177,6 +176,12 @@ void generateCode(vector <redGreenBlue> incomingPPM, vector <redGreenBlue> incom
 	//takes 'characters' from cleanerInput and searches incomingPPM for a match, then outputs the index
 	for (size_t i = 0; i < cleanerInput.size(); i++)
 	{
+		
+		PPMindex = rand();
+		PPMindex %= incomingPPM.size();
+		startPos = PPMindex;
+		offset = 0;
+		
 		while (true)
 		{
 			if (PPMindex == incomingPPM.size() - 1)
