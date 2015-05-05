@@ -66,6 +66,7 @@ void loadVector(vector<redGreenBlue> &wordlist, string filename, string &header,
 //takes a .txt file (hopefully) and uses it to make a vector of ints that correspond to the message
 void messageToVector(string filename, vector <redGreenBlue> &charMap)
 {
+	charMap.clear();
 	string message = "";
 	redGreenBlue temp;
 
