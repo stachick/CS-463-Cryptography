@@ -66,7 +66,6 @@ void loadVector(vector<redGreenBlue> &wordlist, string filename, string &header,
 //takes a .txt file (hopefully) and uses it to make a vector of ints that correspond to the message
 void messageToVector(string filename, vector <redGreenBlue> &charMap)
 {
-	charMap.clear();
 	string message = "";
 	redGreenBlue temp;
 
@@ -168,8 +167,9 @@ void generateCode(vector <redGreenBlue> incomingPPM, vector <redGreenBlue> incom
 	vector <string> temp;
 	vector <int> cleanerInput;
 	ofstream out("codedmessage.txt");
-	int PPMindex = 0;
-	int startPos = 0;
+	int PPMindex = rand();
+	PPMindex %= incomingPPM.size();
+	int startPos = PPMindex;
 	int offset = 0;
 
 	cleanerVector(incomingTXT, cleanerInput);
@@ -177,12 +177,6 @@ void generateCode(vector <redGreenBlue> incomingPPM, vector <redGreenBlue> incom
 	//takes 'characters' from cleanerInput and searches incomingPPM for a match, then outputs the index
 	for (size_t i = 0; i < cleanerInput.size(); i++)
 	{
-
-		PPMindex = rand();
-		PPMindex %= incomingPPM.size();
-		startPos = PPMindex;
-		offset = 0;
-
 		while (true)
 		{
 			if (PPMindex == incomingPPM.size() - 1)
@@ -320,7 +314,7 @@ void convertPasswordToBinary(string password, vector <bitset<8>> &binaryPassword
 	/*
 	for (size_t i = 0; i < binaryPassword.size(); i++)
 	{
-	cout << binaryPassword[i] << endl;
+		cout << binaryPassword[i] << endl;
 	}
 	*/
 }
@@ -358,7 +352,7 @@ void createBinaryCodedPPM(vector <bitset<8>> & messageInBinary, vector <redGreen
 	cout << "Message going into the file" << endl;
 	for (size_t i = 0; i < messageInBinary.size(); i++)
 	{
-	cout << messageInBinary[i] << endl;
+		cout << messageInBinary[i] << endl;
 	}
 	*/
 
